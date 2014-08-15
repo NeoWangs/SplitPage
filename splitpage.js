@@ -62,7 +62,7 @@ SplitPage.prototype = {
         this.disabled = true;
         var _apply = function(msg){
             that.msg = msg;
-            if(that.callback) that.callback(msg.data);
+            if(that.callback) that.callback(msg.data,msg.total);
             func.call(that);
             that.disabled = false;
         };
