@@ -1,0 +1,95 @@
+﻿<!doctype html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <title>SplitPage分页控件Demo</title>
+    <meta name="Author" content="Neoxone" />
+    <meta name="Site" content="http://www.cssass.com" />
+    <link href="http://www.cssass.com/public/css/reset.css" rel="stylesheet" type="text/css" media="all">
+    <script type="text/javascript" src="http://www.cssass.com/public/js/jquery.js"></script>
+    <script type="text/javascript" src="http://www.cssass.com/public/js/extend.js"></script>
+    <script type="text/javascript" src="http://www.cssass.com/public/js/splitpage.js"></script>
+    <style>
+       body{padding:10px;}
+        pre{background:#eee;}
+    </style>
+</head>
+<body>
+<table id="myList" style="width:100%;">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>用户名</th>
+        <th>邮箱</th>
+    </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
+<div id="pageNavi">&nbsp;</div>
+
+<script>
+    function showList(data,total,req){
+        var html = "";
+        for(var i =0; i < data.length; i++){
+            html += "<tr><td>"+data[i].uid+"</td>"+
+                    "<td>"+data[i].account+"</td>"+
+                    "<td>"+data[i].email+"</td></tr>"
+        }
+        html += "<tr><td colspan='3'>共有"+total+"条数据</td></tr>";
+        $("#myList tbody").html(html);
+    };
+
+    var mySplit = new SplitPage({
+        node : $id("pageNavi"),
+        url : "/me.php?r=/codyy/pagedemo&name=a",
+        data : {age:18,sex:1},
+        count : 10,
+        callback : showList,
+        type : 'jsonp' //支持post,get,及jsonp跨站
+    });
+</script>
+
+1. 初始化调用：<pre> new SplitPage({
+    node : $id("pageNavi"),  //分页栏元素节点
+    url : "/me.php?r=/codyy/pagedemo&name=a", //ajax请求地址
+    data : {age:18,sex:1},  //请求参数
+    count : 10,  //每页显示条数
+    callback : showList,  //回调方法(返回列表数据和总页码)
+    type : 'jsonp' //支持post,get,及jsonp跨站
+  })</pre>
+<br />
+2. 搜索：实例对象调用search方法,第一个参数为请求地址，第二个参数为请求参数：
+<a href="javascript:;" onclick='mySplit.search("http://www.cssass.com/me.php?r=/codyy/pagedemo&age=20",{sex:2});'>搜索</a>，
+<a href="javascript:;" onclick='mySplit.search("http://www.cssass.com/me.php?r=/codyy/pagedemo");'>显示全部</a>
+<pre>
+    mySplit.search("/me.php?r=/codyy/pagedemo&age=20",{sex:2}); //搜索条件:age=20,sex=2
+</pre>
+<br />
+3. 重加载当前页：用于删除数据后刷新且保留在当前页，实例对象调用reload方法：<a href="javascript:;" onclick="mySplit.reload();">重加载</a>
+<pre>
+    mySplit.reload();
+</pre>
+<br />
+4.限制页码数量(showLimit参数)：
+<pre>
+new SplitPage({
+    node : $id("pageNavi"),
+    url : "/me.php?r=/codyy/pagedemo&name=a",
+    <b>showLimit : 2,</b> //(左2右2，默认值为3)
+    type : 'jsonp'
+  })
+</pre>
+当showLimit : 0 时，页码布局采用迷你分页，只存在“上一页，下一页”。
+<br />
+<br />
+5.加载指定页(current参数)
+<pre>
+new SplitPage({
+    node : $id("pageNavi"),
+    url : "/me.php?r=/codyy/pagedemo&name=a",
+    <b>current : 2,</b> //(当前页为第三页，默认为0)
+  })
+</pre>
+</body>
+</html>
