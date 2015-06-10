@@ -80,7 +80,7 @@ SplitPage.prototype = {
 		this.disabled = true;
 		var _apply = function(msg) {
 			that.msg = msg;
-			if (msg.data.length == 0 && that.req.start > 0) {
+			if (msg.data.length == 0 && that.req.start > 0 && !needToAppend) {
 				//未查出数据，且当前页不是第一页时，加载前一页
 				that.disabled = false;
 				that.prev();
