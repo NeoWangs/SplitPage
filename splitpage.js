@@ -6,13 +6,15 @@
 // | Site: www.cssass.com
 // +----------------------------------------------------------------------+
 function SplitPage(config) {
+	var that = this;
 	this.pageWrap = config.node; //容器
 	this.pageWrap.className = "pageNavi";
-	if (config.showLimit == 0) addClass(this.pageWrap, "miniPageNavi");
+	if (config.showLimit == 0) addClass(this.pageWrap, "miniPageNavi"); //分页只保留上下页
 	this.showLimit = config.showLimit || 3; //显示页码数（左3右3）
 	this.count = config.count || 10; //每页显示数
 	this.url = config.url; //请求地址(可带参数)
-	var baseStart = config.current ? config.current * this.count : 0;
+	this.append = config.append || false; //是否append数据到页面
+	var baseStart = config.current ? config.current * this.count : 0; //起始页
 	this.req = {
 		start: baseStart,
 		end: baseStart + this.count - 1
@@ -22,6 +24,17 @@ function SplitPage(config) {
 	this.type = config.type; //支持jsonp
 	this.disabled = false;
 	this.init();
+	if(this.append){  
+		events.addEvent(window,"scroll",function(){
+			//绑定下拉加载事件
+			var scrollTop = document.body.scrollTop || document.documentElement.scrollTop,
+				windowHeight = document.documentElement.clientHeight,
+				documentHeight = document.body.offsetHeight;
+			if(windowHeight + scrollTop > documentHeight - 50){
+				that.next(that.append);
+			}
+		});
+	};
 }
 SplitPage.prototype = {
 	init: function() {
@@ -51,17 +64,17 @@ SplitPage.prototype = {
 		this.req.end -= this.count;
 		this.ajaxGet(this.setLinks);
 	},
-	next: function() {
+	next: function(needToAppend) {
 		this.req.start += this.count;
 		this.req.end += this.count;
-		this.ajaxGet(this.setLinks);
+		this.ajaxGet(this.setLinks, needToAppend);
 	},
 	getByNum: function(n) {
 		this.req.start = (n - 1) * this.count;
 		this.req.end = n * this.count - 1;
 		this.ajaxGet(this.setLinks);
 	},
-	ajaxGet: function(func) {
+	ajaxGet: function(func,needToAppend) {
 		var that = this;
 		if (this.disabled) return;
 		this.disabled = true;
@@ -73,8 +86,8 @@ SplitPage.prototype = {
 				that.prev();
 				return;
 			}
-			if (that.callback) that.callback(msg.data, msg.total, that.req);
-			func.call(that);
+			if (that.callback) that.callback(msg.data, msg.total, that.req, needToAppend); //total:总页数；req:原请求参数；needToAppend:数据是否append到页面
+			if(!that.append) func.call(that);
 			that.disabled = false;
 		};
 		this.req["t"] = random();
