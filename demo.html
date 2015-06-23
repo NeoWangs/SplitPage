@@ -44,8 +44,8 @@
 		  })</pre>
 		<br />
 		2. 搜索：实例对象调用search方法,第一个参数为请求地址，第二个参数为请求参数：
-		<a href="javascript:;" onclick='mySplit.search("http://www.cssass.com/me.php?r=/codyy/pagedemo&age=20",{sex:2});'>搜索</a>，
-		<a href="javascript:;" onclick='mySplit.search("http://www.cssass.com/me.php?r=/codyy/pagedemo");'>显示全部</a>
+		<a href="javascript:;" onclick='mySplit.search("/me.php?r=/codyy/pagedemo&age=20",{sex:2});'>搜索</a>，
+		<a href="javascript:;" onclick='mySplit.search("/me.php?r=/codyy/pagedemo");'>显示全部</a>
 		<pre>
 		    mySplit.search("/me.php?r=/codyy/pagedemo&age=20",{sex:2}); //搜索条件:age=20,sex=2
 		</pre>
@@ -61,6 +61,7 @@
 		    node : $id("pageNavi"),
 		    url : "/me.php?r=/codyy/pagedemo&name=a",
 		    <b>showLimit : 2,</b> //(左2右2，默认值为3)
+		    callback : showList, 
 		    type : 'jsonp'
 		  })
 		</pre>
@@ -72,6 +73,7 @@
 		new SplitPage({
 		    node : $id("pageNavi"),
 		    url : "/me.php?r=/codyy/pagedemo&name=a",
+		    callback : showList, 
 		    <b>current : 2</b> //(当前页为第三页，默认为0)
 		  })
 		</pre>
@@ -81,7 +83,19 @@
 		new SplitPage({
 		    node : $id("pageNavi"),
 		    url : "/me.php?r=/codyy/pagedemo&name=a",
-		    <b>append : UA.isMobile</b> //移动端启用下拉加载
+		    <b>append : UA.isMobile,</b> //移动端启用下拉加载
+		    callback : showList //如果是下拉加载，回调方法会多出一个needToAppend值
+		  })
+		</pre>
+		<br />
+		7. 假分页(fakeData参数)
+		<pre>
+		new SplitPage({
+		    node : $id("pageNavi"),
+		    <b>fakeData : {
+		    	data : [1,2,3],
+		    	total : 3
+		    }</b>  //有了fakeData数据，就不要异步请求获取了
 		  })
 		</pre>
 	</div>
@@ -103,11 +117,54 @@
         	 $tag("tbody",$id("myList"))[0].innerHTML = html;
         }
     };
-
+	
+	var fakeData  = {"data": [{
+		"uid": "1",
+		"account": "admin@admin.com",
+		"email": null
+	}, {
+		"uid": "2",
+		"account": "14000002",
+		"email": null,
+	},  {
+		"uid": "3",
+		"account": "14000003",
+		"email": null,
+	}, {
+		"uid": "4",
+		"account": "14000004",
+		"email": null,
+	},{
+		"uid": "5",
+		"account": "14000005",
+		"email": null,
+	},{
+		"uid": "6",
+		"account": "14000006",
+		"email": null,
+	},{
+		"uid": "7",
+		"account": "14000007",
+		"email": null,
+	},{
+		"uid": "8",
+		"account": "14000008",
+		"email": null,
+	},{
+		"uid": "9",
+		"account": "14000009",
+		"email": null,
+	},{
+		"uid": "10",
+		"account": "14000010",
+		"email": null,
+	}], "total": 10};
+	
     var mySplit = new SplitPage({
         node : $id("pageNavi"),
         url : "http://www.cssass.com/me.php?r=/codyy/pagedemo&name=a",
         data : {age:18,sex:1},
+        showLimit : 3,
         count : 20,
         append : UA.isMobile,
         callback : showList,

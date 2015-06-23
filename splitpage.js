@@ -19,18 +19,19 @@ function SplitPage(config) {
 		start: baseStart,
 		end: baseStart + this.count - 1
 	};
+	if (config.fakeData) this.fakeData = config.fakeData;
 	extendCopy(config.data || {}, this.req); //请求参数
 	this.callback = config.callback; //请求回调
 	this.type = config.type; //支持jsonp
 	this.disabled = false;
 	this.init();
-	if(this.append){  
-		events.addEvent(window,"scroll",function(){
+	if (this.append) {
+		events.addEvent(window, "scroll", function() {
 			//绑定下拉加载事件
 			var scrollTop = document.body.scrollTop || document.documentElement.scrollTop,
 				windowHeight = document.documentElement.clientHeight,
 				documentHeight = document.body.offsetHeight;
-			if(windowHeight + scrollTop > documentHeight - 50){
+			if (windowHeight + scrollTop > documentHeight - 50) {
 				that.next(that.append);
 			}
 		});
@@ -74,7 +75,7 @@ SplitPage.prototype = {
 		this.req.end = n * this.count - 1;
 		this.ajaxGet(this.setLinks);
 	},
-	ajaxGet: function(func,needToAppend) {
+	ajaxGet: function(func, needToAppend) {
 		var that = this;
 		if (this.disabled) return;
 		this.disabled = true;
@@ -87,8 +88,22 @@ SplitPage.prototype = {
 				return;
 			}
 			if (that.callback) that.callback(msg.data, msg.total, that.req, needToAppend); //total:总页数；req:原请求参数；needToAppend:数据是否append到页面
-			if(!that.append) func.call(that);
+			if (!that.append) func.call(that);
 			that.disabled = false;
+		};
+		if (this.fakeData) {
+			//假分页，不必异步请求数据
+			var i = this.req.start,
+				max = Math.min(this.req.end, this.fakeData.data.length);
+			msg = {
+				data: [],
+				total: this.fakeData.total
+			};
+			for (; i <= max; i++) {
+				msg.data.push(this.fakeData.data[i]);
+			}
+			_apply(msg);
+			return;
 		};
 		this.req["t"] = random();
 		switch (this.type) {
